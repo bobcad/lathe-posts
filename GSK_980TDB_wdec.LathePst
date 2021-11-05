@@ -1,0 +1,696 @@
+ ---------------------------------------------------------------------
+---------------------------------------------------------------------
+---  BobCAD-CAM Post Processor --------------------------------------
+---------------------------------------------------------------------
+--- Initial Software Version: BobCAD-CAM V27
+--- Initial Creation Date: 4-23-15
+--- Author: ag
+--- Machine: GSK-980 TDB Lathe
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+--- REVISION LOG ----------------------------------------------------
+---
+--- 8/18/2014 - Initial Setup for V27
+--- 
+---
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+--- SPECIAL NOTES ABOUT THIS POST AND MACHINE -----------------------
+---------------------------------------------------------------------
+---
+---
+---------------------------------------------------------------------
+
+
+****Version number MONTH DAY YEAR****
+1000. Version Information = Version Month Day Year? "10.0 04 23 2015"
+
+0. File Header.
+	"O",prog_n,comment_start,prog_name,comment_end
+	comment_start,"DATE: ",output_date,comment_end
+	comment_start,"TIME: "output_time,comment_end
+	user_comment_1
+	user_comment_2
+	user_comment_3
+	user_comment_4
+	user_comment_5
+	user_comment_6
+	user_comment_7
+	user_comment_8
+	user_comment_9
+	user_comment_10
+	user_comment_11
+	user_comment_12
+	user_comment_13
+	user_comment_14
+	user_comment_15
+	" "
+
+2. Start of program with turning cycles.
+	comment_start,comment1,comment_end
+	comment_start,comment2,comment_end
+	n,"M12"
+	n,t
+	n,spindle_on,s
+	n,rapid_move,force_x,xr,force_z,zr,coolant_on
+
+3. Tool change for turning cycles.
+	n,coolant_off
+	n,spindle_off
+	n,"/",optional_stop
+	" "
+	comment_start,comment1,comment_end
+	comment_start,comment2,comment_end
+	n,t
+	n,spindle_on,s
+	n,rapid_move,force_x,xr,force_z,zr,coolant_on
+
+4. Next operation same tool turning.
+	n,s
+	n,rapid_move,xr,zr
+
+5. End of turning cycles.
+	n,"T0100 U0 W0"
+	n,spindle_off
+	n,coolant_off
+	n,"M13"	
+	n,end_of_file
+
+6. Next operation same tool facing.
+	n,s
+	n,rapid_move,xr,zr
+
+7. Same operation same tool turning.
+	n,s
+	n,rapid_move,xr,zr
+
+8. Set debug.
+	debug_off
+	
+9. Same operation same tool facing.
+	n,s
+	n,rapid_move,xr,zr
+
+10. Cancel cutter compensation.
+	"G40"
+
+11. Cutter compensation left.
+	"G41"
+
+12. Cutter compensation right.
+	"G42"
+
+13. Tool length compensation.
+	"G43"
+
+20. Rapid move.
+	n,rapid_move,xr,zr
+
+21. Feed move.
+	n,cc,feed_move,x_f,z_f,feed_rate
+
+22. Dwell
+	n,"G4",dwell
+		
+
+25. Arc move.
+	n,g_arc_move,x_f,z_f,arc_center,feed_rate
+
+26. Auto cancel cutter compensation after last feed move.
+   n,cancel_offset
+
+27. Rigid tapping start.
+28. Rigid tapping end.
+58. Output before any cutting cycle.
+
+
+59. Output after any cutting cycle. 
+
+60. Auto finish cycle for G71,G72,G73 for turning.
+	n,"G70",cc,n_first_finish,n_last_finish,finish_feed
+
+62. Start of rough (G71) turning cycle.
+	n,"G71",rough_depth_of_cut_two_line,rough_retract_amount
+	n,"G71",n_first_rough,n_last_rough,rough_x_allowance,rough_z_allowance,rough_feed
+
+63. End of rough (G71) turning cycle.
+
+66. Start of rough (G72) facing cycle.
+	n,"G72",rough_depth_of_cut_two_line,rough_retract_amount
+	n,"G72",n_first_rough,n_last_rough,rough_x_allowance,rough_z_allowance,rough_feed
+
+67. End of rough (G72) facing cycle
+
+70. Start of finish (G73) turning cycle
+	n,"G73",finish_x_spring_pass_stock_radius,finish_z_spring_pass_stock_radius,finish_number_of_cuts_two_line
+	n,"G73",n_first_rough,n_last_rough,finish_x_allowance,finish_z_allowance,finish_number_of_cuts,rough_feed
+
+71. End of finish G73) turning cycle
+
+74. Start of groove (G75) turning cycle
+	n,"G75",groove_retract_amount
+	n,"G75",groove_x_bottom,groove_z_bottom,groove_peck_increment,groove_depth_of_cut,groove_rvalue,rough_feed
+
+75. End of groove (G75) turning cycle
+
+78. Start of groove (G74) facing cycle
+	n,"G74",groove_retract_amount
+	n,"G74",groove_x_bottom,groove_z_bottom,groove_peck_increment,groove_depth_of_cut,groove_rvalue,rough_feed
+
+79. End of groove (G74) facing cycle
+
+84. End of drill separate moves cycle
+86. Start of threading cycles.
+
+87. Start of thread (G76) cycle
+	n,"G76",thread_angle_in,thread_last_cut,thread_machine_allowance
+	n,"G76",thread_x2,thread_z2,taper_height,thread_height,thread_first_cut,thread_lead
+
+88. End of thread (G76) cycle
+
+89. Start of thread (G33) cycle
+
+90. End of thread (G33) cycle
+
+91. End of threading cycles.
+
+92. G32 line move.
+	n,thread_g33_gcode,thread_g33_xmove,thread_g33_zmove,thread_g33_feedrate
+
+93. G32 thread cut move.
+	n,thread_g33_gcode,thread_g33_xmove,thread_g33_zmove,thread_g33_feedrate
+
+94. G32 Separate Moves InFeed Block for Tapping Cycle
+
+95. G32 Separate Moves OutFeed Block for Tapping Cycle
+100. Start of cutoff cycle
+
+101. End of cutoff cycle
+
+104. Start of auto finish no canned cycle.
+
+
+105. End of auto finish no canned cycle.
+
+108. Start of auto stock feed cycle.
+	"( FEED STOCK )"
+	n,rapid_to_pickup_z
+	n,rapid_to_position_x
+	n,"M11"
+	n,"G4","U.5"
+	n,rapid_to_stock_feed_z
+	n,"G4","U.5"
+	n,"M10"
+	n,"G4","U.5"
+	n,rapid_to_position_z
+	n,"G28","U0"
+	n,"Z2."
+	n,"M1"
+
+109. End of auto stock feed cycle.
+
+110. Tool list format.
+	"(LTOOL",t,ltool_home,"S",ltool_type,"O",ltool_cutting_angle,"I",ltool_ic,"A",ltool_angle,"C",ltool_corner_rad,"H",ltool_height,"D",ltool_diam,"N",ltool_orientation,")"
+
+111. Stock definition.
+	"(SCYL S3 X0 Y0 Z", z_end_of_stock, "D",stock_diameter, "L",stock_length,")"
+	"(HCYL S3 X0 Y0 Z", z_end_of_stock, "D",stock_internal_diameter, "L",stock_length,")"
+
+
+120. Drill canned cycle cancel.
+   n, "G80"
+   
+   
+121. High speed peck drill canned cycle.
+   
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,peck_drill_increment,dwell,canned_feed_rate
+   
+122. Left handed tapping canned cycle.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,tapping_feedrate
+
+123. Fine boring canned cycle.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,peck_drill_increment,dwell,canned_feed_rate
+
+124. Standard drill canned cycle.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,canned_feed_rate
+   
+125. Standard drill canned cycle with dwell.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,dwell,canned_feed_rate
+   
+126. Peck drill canned cycle.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,peck_drill_increment,dwell,canned_feed_rate
+   
+127. Tapping canned cycle.
+   rigid_tapping_start
+   n, tap_feed_mode
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,tap_feed
+   
+128. Boring cycle #1 canned cycle.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,canned_feed_rate
+   
+129. Boring cycle #2 canned cycle.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,canned_feed_rate
+   
+130. Back boring cycle canned cycle.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,peck_drill_increment,dwell,canned_feed_rate
+   
+131. Boring cycle #1 canned cycle with dwell.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,dwell,canned_feed_rate
+   
+132. Boring cycle #2 canned cycle with dwell.
+   n,g_canned_cycle,x_f,drill_depth,reference_plane,dwell,canned_feed_rate
+
+199. Not Used
+
+220. Is X modal? y
+222. Is Z modal? y
+223. Are the g codes modal? n
+224. Are the xy (or yz or xz) coordinates modal in arc milling? n
+225. Are the g codes (G02 and G03) modal in arc milling? n
+228. Output sequence numbers? n
+230. Delete the decimal point? n
+231. Delete leading zeros? y
+232. Delete trailing zeros? n
+234. Places before decimal point for reals? 1
+235. Number of places for G and M codes? 1
+236. Places after decimal for feedrate ? 4
+237. Scale factor for feedrate ? 1
+239. Add spaces to the program? y
+241. Break arcs into quadrants? n
+242. Arc center a=absolute, b=incremental, d=unsigned inc., e=radius? e
+243. Break arcs into two pieces if greater than 180 degrees? n
+247. Sign of X Spindle 1 (p = pos, n = neg, e = either, r = reverse)? e
+248. Sign of X Spindle 2 (p = pos, n = neg, e = either, r = reverse)? e
+249. Output X as a diameter or radius (d/r)? d
+250. Use canned cycle for drilling? n
+251. Use canned cycle for peck drilling? n
+252. Use canned cycle for chip break? n
+253. Use canned cycle for tap? n
+254. Use canned cycle for bore #1? n
+255. Use canned cycle for bore #2? n
+256. Use back boring cycle canned cycle? n
+257. Use left hand tap cycle canned cycle? n
+
+258. Use two line canned cycle format? y
+259. Depth format (d = default, t = trailing)? t
+260. Amount to add to t to obtain t1? 0
+261. Amount to add to t to obtain t2? 0
+262. Value of t1 at t = 0? 0
+263. Value of t2 at t = 0? 0
+265. Places before decimal point for angles? 1
+
+268. Use fine boring cycle canned cycle? y
+269. Rigid tapping? y
+
+300. Number of places for sequence numbers? 2
+302. Number of places for program number? 4
+
+305. Tap Feed Mode (0=UPM 1=UPR)? 1
+306. Reverse Tap Spindle Direction? n
+
+411. R value (Retract amount) for first line of 2 line rough cycle? 0.1
+412. R value (Retract amount) for first line of 2 line groove cycle? 0.1
+413. R value (Thread mach allowance) 2 line G76 cycle? 0.001
+
+419. Break arcs with radius larger than? 0.0
+420. Arc segment breaking tolerance? 0.0001
+421. Line segment max length? 999.99
+
+512. Tool number format (1=n, 2=n*101, 3=100*n+toffset, 4=toofset, 5=n*100)? 2
+513. Number of digits for tool number? 4
+
+517. Medium gear1 spindle speed? 901
+518. Medium gear2 spindle speed? 10000
+519. Medium gear3 spindle speed? 10000
+520. Medium gear4 spindle speed? 10000
+521. Medium gear5 spindle speed? 10000
+522. Medium gear6 spindle speed? 10000
+523. Medium gear7 spindle speed? 10000
+524. Medium gear8 spindle speed? 10000
+525. Medium gear9 spindle speed? 10000
+526. High gear spindle speed? 10000
+
+540. Number of decimal places real numbers metric ? 2
+541. Number of decimal places real numbers inch ? 3
+542. Number of decimal places angles ? 2
+544. Auto output cancel offset (G40)(0=no, 1=On last feed move, 2=after last feed move)? 2
+
+612. Reverse G2 and G3? n
+613. Reverse the sign of I? n
+614. Reverse the sign of K? n
+615. Reverse the sign of Thread taper height (R)? n
+
+616. Output G99 instead of G98 in drilling? y
+617. Output G98/G99 in drilling? y
+
+635. Are Feed Rates modal? y
+
+640. Check each output line with scripting? n
+
+650. Break arc segments into lines? n
+651. Break line segments into smaller lines? n
+
+705. Symbol for lead? "F"
+706. Symbol for IPR feedrate? "F"
+707. Symbol for IPM feedrate? "F"
+710. Begin comment character? "( "
+711. End comment character? " )"
+712. Threading chamfer out start code? "M23"
+713. Threading chamfer out end code? "M24"
+714. Inch mode machining? "G20"
+715. Metric mode machining? "G21"
+
+720. Absolute coordinates? "G90"
+721. Incremental coordinates? "G91"
+722. Coordinate zero set? "G92"
+
+725. End of file? "M30"
+726. Stop? "M0"
+727. Optional Stop? "M1"
+728. Subprogram call? "M98"
+729. Subprogram return? "M99"
+
+739. Cancel wire offset? "G40"
+
+741. Prefix for radius values? "R"
+742. Prefix for arc Z center? "K"
+743. Prefix for arc X center? "I"
+
+749. Reference Plane prefix? "R"
+
+
+750. Comp left? "G41"
+751. Comp right? "G42"
+
+756. Block delete? "/"
+759. Add these characters to the end of each line? ""
+
+763. Feed Unit Per Minute Code? "G98"
+764. Feed Unit Per Revolution Code? "G99"
+
+767. Prefix for tap feed IPM? "F"
+768. Prefix for tap feed IPR? "F"
+
+773. Coolant on String ? " M8"
+774. Coolant off String ? " M9"
+
+780. Symbol for Spindle Speed ? "S"
+781. Symbol for Tool Number Prefix ? "T"
+782. Spindle forward String ? "M3"
+783. Spindle reverse String ? "M4"
+784. Spindle off String ? "M5"
+785. Symbol for CSS spindle speed? "G96"
+786. Symbol for RPM spindle speed? "G97"
+
+787. Coolant Mist code? "M08"
+788. Coolant Air code? "M08"
+789. Coolant Oil code? "M08"
+
+790. Prefix for canned cycle start line Number? "P"
+791. Prefix for canned cycle end line Number? "Q"
+792. Prefix for thread G76 first cut amount? "Q"
+793. Prefix for thread height? "P"
+794. Prefix for thread angle in? "P"
+795. Prefix for thread last cut amount? "Q"
+796. Prefix for thread machine allowance? "R"
+797. GCode for Rapid Move? "G0"
+798. GCode for Feed Move? "G1"
+799. GCode for Arc CW? "G2"
+800. GCode for Arc CCW? "G3"
+801. Prefix for X Move? "X"
+802. Prefix for Y Move? "Y"
+803. Prefix for Z Move? "Z"
+804. Prefix for Rough Cycle depth of cut? "U"
+805. Prefix for Rough Cycle stock allowance X? "U"
+806. Prefix for Rough Cycle stock allowance Z? "W"
+807. Prefix for Rough Cycle retract amount? "R"
+808. Prefix for Finish Cycle stock allowance X? "U"
+809. Prefix for Finish Cycle stock allowance Z? "W"
+810. Prefix for Finish Cycle X stock amount for spring passes? "I"
+811. Prefix for Finish Cycle Z stock amount for spring passes? "K"
+812. Prefix for Groove Cycle retract amount? "R"
+813. Prefix for Groove Cycle X bottom? "X"
+814. Prefix for Groove Cycle Z bottom? "Z"
+815. Prefix for Groove Cycle depth of cut? "K"
+816. Prefix for Groove Cycle peck increment? "I"
+817. Prefix for thread taper height? "R"
+
+818. Retract to initial position? "G98"
+819. Retract to R Plane? "G99"
+820. Prefix for tap reference plane? "R"
+821. GCode for G32 Style tapping? "G32"
+
+822. GCode for simple threading cycle? "G32"
+823. Prefix for X depth for roughing cycle? "U"
+824. Prefix for Z depth for roughing cycle? "W"
+825. Prefix for groove dwell? "P"
+826. Prefix for groove peck clearance? "E"
+827. Prefix for groove peck retract? "R"
+830. Code for low spindle gear? " M40"
+831. Code for medium1 spindle gear? " M41"
+832. Code for medium2 spindle gear? " M42"
+833. Code for medium3 spindle gear? " M43"
+834. Code for medium4 spindle gear? " M44"
+835. Code for medium5 spindle gear? " M45"
+836. Code for medium6 spindle gear? " M46"
+837. Code for medium7 spindle gear? " M47"
+838. Code for medium8 spindle gear? " M48"
+839. Code for medium9 spindle gear? " M49"
+840. Code for high spindle gear? " M000000000"
+
+841. Prefix for drill first peck amount? "V"
+842. Prefix for drill peck increment amount? "Q"
+843. Prefix for Tool Home Number? "M"
+890. Canned cycle cancel? "G80"
+
+844. Drill depth prefix? "Z"
+845. Prefix for drill canned cycle feed rate? "F"
+846. Prefix for initial plane? "I"
+847. Dwell prefix? "P"
+
+
+850. Standard drilling cycle no dwell #1? "G81"
+851. Peck drill cycle no dwell #2? "G83"
+852. High speed peck drill cycle no dwell #3? "G73"
+853. Tapping cycle no dwell #4? "G84"
+854. Boring cycle #1 no dwell #5? "G85"
+855. Boring cycle #2 no dwell #6? "G86"
+856. Back boring cycle no dwell #7? "G87"
+857. Left hand tapping cycle no dwell #8? "G74"
+858. Fine boring cycle no dwell #9? "G76"
+
+860. Standard drilling cycle with dwell #1? "G82"
+861. Peck drill cycle with dwell #2? "G83"
+862. High speed peck drill cycle with dwell #3? "G73"
+863. Tapping cycle with dwell #4? "G84"
+864. Boring cycle #1 with dwell #5? "G88"
+865. Boring cycle #2 with dwell #6? "G89"
+866. Back boring cycle with dwell #7? "G77"
+867. Left hand tapping cycle with dwell #8? "G74"
+868. Fine boring cycle with dwell #9? "G76"
+
+890. Canned cycle cancel? "G80"
+
+
+2001. Program Block 1. Cancel G41, G42 only when needed.
+	
+
+2002. Program Block 2.
+
+2003. Program Block 3.
+
+2004. Program Block 4.
+
+2005. Program Block 5.
+
+2006. Program Block 6.
+
+2007. Program Block 7.
+
+2008. Program Block 8.
+
+2009. Program Block 9.
+
+2010. Program Block 10.
+
+2011. Program Block 11.
+
+2012. Program Block 12.
+
+2013. Program Block 13.
+
+2014. Program Block 14.
+
+2015. Program Block 15.
+
+2016. Program Block 16.
+
+2017. Program Block 17.
+
+2018. Program Block 18.
+
+2019. Program Block 19.
+
+2020. Program Block 20.
+
+2021. Program Block 21.
+
+2022. Program Block 22.
+
+2023. Program Block 23.
+
+2024. Program Block 24.
+
+2025. Program Block 25.
+
+2026. Program Block 26.
+
+2027. Program Block 27.
+
+2028. Program Block 28.
+
+2029. Program Block 29.
+
+2030. Program Block 30.
+
+2031. Program Block 31.
+
+2032. Program Block 32.
+
+2033. Program Block 33.
+
+2034. Program Block 34.
+
+2035. Program Block 35.
+
+2036. Program Block 36.
+
+2037. Program Block 37.
+
+2038. Program Block 38.
+
+2039. Program Block 39.
+
+2040. Program Block 40.
+
+2041. Program Block 41.
+
+2042. Program Block 42.
+
+2043. Program Block 43.
+
+2044. Program Block 44.
+
+2045. Program Block 45.
+
+2046. Program Block 46.
+
+2047. Program Block 47.
+
+2048. Program Block 48.
+
+2049. Program Block 49.
+
+2050. Program Block 50.
+
+2051. Program Block 51.
+
+2052. Program Block 52.
+
+2053. Program Block 53.
+
+2054. Program Block 54.
+
+2055. Program Block 55.
+
+2056. Program Block 56.
+
+2057. Program Block 57.
+
+2058. Program Block 58.
+
+2059. Program Block 59.
+
+2060. Program Block 60.
+
+2061. Program Block 61.
+
+2062. Program Block 62.
+
+2063. Program Block 63.
+
+2064. Program Block 64.
+
+2065. Program Block 65.
+
+2066. Program Block 66.
+
+2067. Program Block 67.
+
+2068. Program Block 68.
+
+2069. Program Block 69.
+
+2070. Program Block 70.
+
+2071. Program Block 71.
+
+2072. Program Block 72.
+
+2073. Program Block 73.
+
+2074. Program Block 74.
+
+2075. Program Block 75.
+
+2076. Program Block 76.
+
+2077. Program Block 77.
+
+2078. Program Block 78.
+
+2079. Program Block 79.
+
+2080. Program Block 80.
+
+2081. Program Block 81.
+
+2082. Program Block 82.
+
+2083. Program Block 83.
+
+2084. Program Block 84.
+
+2085. Program Block 85.
+
+2086. Program Block 86.
+
+2087. Program Block 87.
+
+2088. Program Block 88.
+
+2089. Program Block 89.
+
+2090. Program Block 90.
+
+2091. Program Block 91.
+
+2092. Program Block 92.
+
+2093. Program Block 93.
+
+2094. Program Block 94.
+
+2095. Program Block 95.
+
+2096. Program Block 96.
+
+2097. Program Block 97.
+
+2098. Program Block 98.
+
+2099. Program Block 99.
+
+2101. Read entire file after post.
+
+2102. Read each line on output (if line 540 is set to Y).
